@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Tailwind CSS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Estilos personalizados para mejor responsividad */
+        @media (max-width: 640px) {
+            .stats-card {
+                padding: 1rem !important;
+            }
+            .table-cell {
+                padding: 0.75rem 0.5rem !important;
+            }
+        }
+        
+        /* Animaciones suaves */
+        .mobile-menu {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .mobile-menu.active {
+            transform: translateX(0);
+        }
+        
+        /* Overlay para móvil */
+        .menu-overlay {
+            display: none;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .menu-overlay.active {
+            display: block;
+        }
+        
+        /* Asegurar que el contenido no se desborde */
+        .responsive-table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        /* Mejorar legibilidad en móvil */
+        @media (max-width: 768px) {
+            .text-responsive {
+                font-size: 0.875rem;
+            }
+            
+            .text-responsive-lg {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Overlay para móvil -->
+    <div class="menu-overlay fixed inset-0 z-30" id="menuOverlay"></div>
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-lg sticky top-0 z-20">
+        <div class="px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo y botón menú móvil -->
+                <div class="flex items-center">
+                    <button id="mobileMenuButton" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 mr-3">
+                        <i class="fas fa-bars text-gray-700 text-lg"></i>
+                    </button>
+                    <div class="flex items-center">
+                        <i class="fas fa-chart-line text-indigo-600 text-xl mr-2"></i>
+                        <span class="text-xl font-bold text-indigo-600">DashPro</span>
+                    </div>
+                </div>
+
+                <!-- Botón para colapsar sidebar en desktop -->
+                <button id="toggleSidebar" class="hidden lg:flex items-center p-2 rounded-lg hover:bg-gray-100 text-gray-700">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+
+                <!-- Notificaciones y perfil -->
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <button class="p-2 rounded-lg hover:bg-gray-100 relative">
+                        <i class="fas fa-bell text-gray-700"></i>
+                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+                    </button>
+                    <div class="flex items-center gap-2">
+                        <img src="https://i.pravatar.cc/40" alt="User" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full">
+                        <span class="hidden sm:inline text-gray-700 font-medium">Admin</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex">
+        <!-- Sidebar para desktop -->
+        <aside id="sidebar" class="hidden lg:flex flex-col bg-white shadow-lg w-64 min-h-[calc(100vh-4rem)]">
+            <nav class="mt-6 flex-1 px-4">
+                <a href="#" class="flex items-center px-4 py-3 text-gray-700 bg-indigo-50 border-r-4 border-indigo-600 rounded-lg mb-2">
+                    <i class="fas fa-home text-gray-700 w-5"></i>
+                    <span class="ml-3 font-medium">Dashboard</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-lg mb-2">
+                    <i class="fas fa-users text-gray-600 w-5"></i>
+                    <span class="ml-3">Usuarios</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-lg mb-2">
+                    <i class="fas fa-chart-bar text-gray-600 w-5"></i>
+                    <span class="ml-3">Analíticas</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-lg mb-2">
+                    <i class="fas fa-cog text-gray-600 w-5"></i>
+                    <span class="ml-3">Configuración</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-lg mb-2">
+                    <i class="fas fa-shopping-cart text-gray-600 w-5"></i>
+                    <span class="ml-3">Pedidos</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-lg mb-2">
+                    <i class="fas fa-box text-gray-600 w-5"></i>
+                    <span class="ml-3">Productos</span>
+                </a>
+            </nav>
+            
+            <!-- Pie de sidebar -->
+            <div class="p-4 border-t border-gray-200">
+                <div class="flex items-center">
+                    <div class="bg-indigo-100 p-2 rounded-lg">
+                        <i class="fas fa-question-circle text-indigo-600"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-700">¿Necesitas ayuda?</p>
+                        <a href="#" class="text-sm text-indigo-600 hover:underline">Ver documentación</a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Sidebar móvil -->
+        <aside id="mobileSidebar" class="mobile-menu fixed left-0 top-0 h-full w-64 bg-white shadow-xl z-40 lg:hidden">
+            <div class="flex flex-col h-full">
+                <!-- Encabezado del menú móvil -->
+                <div class="flex items-center justify-between p-4 border-b">
+                    <div class="flex items-center">
+                        <i class="fas fa-chart-line text-indigo-600 text-xl mr-2"></i>
+                        <span class="text-xl font-bold text-indigo-600">DashPro</span>
+                    </div>
+                    <button id="closeMobileMenu" class="p-2">
+                        <i class="fas fa-times text-gray-700 text-lg"></i>
+                    </button>
+                </div>
+                
+                <!-- Navegación móvil -->
+                <nav class="flex-1 p-4">
+                    <a href="#" class="flex items-center px-4 py-3 text-gray-700 bg-indigo-50 rounded-lg mb-2">
+                        <i class="fas fa-home text-gray-700 w-5"></i>
+                        <span class="ml-3 font-medium">Dashboard</span>
+                    </a>
+                    <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-lg mb-2">
+                        <i class="fas fa-users text-gray-600 w-5"></i>
+                        <span class="ml-3">Usuarios</span>
+                    </a>
+                    <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-lg mb-2">
+                        <i class="fas fa-chart-bar text-gray-600 w-5"></i>
+                        <span class="ml-3">Analíticas</span>
+                    </a>
+                    <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-lg mb-2">
+                        <i class="fas fa-cog text-gray-600 w-5"></i>
+                        <span class="ml-3">Configuración</span>
+                    </a>
+                    <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-lg mb-2">
+                        <i class="fas fa-shopping-cart text-gray-600 w-5"></i>
+                        <span class="ml-3">Pedidos</span>
+                    </a>
+                </nav>
+                
+                <!-- Pie del menú móvil -->
+                <div class="p-4 border-t border-gray-200">
+                    <div class="flex items-center">
+                        <div class="bg-indigo-100 p-2 rounded-lg">
+                            <i class="fas fa-question-circle text-indigo-600"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-gray-700">¿Necesitas ayuda?</p>
+                            <a href="#" class="text-sm text-indigo-600 hover:underline">Ver documentación</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Contenido Principal -->
+        <main class="flex-1 w-full p-4 md:p-6 lg:p-8">
+            <!-- Header con título y filtros -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 md:mb-8">
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4 sm:mb-0 text-responsive-lg">Dashboard</h1>
+                <div class="flex flex-col xs:flex-row gap-3">
+                    <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center justify-center text-sm">
+                        <i class="fas fa-filter mr-2"></i>
+                        <span>Filtrar</span>
+                    </button>
+                    <button class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center justify-center text-sm">
+                        <i class="fas fa-plus mr-2"></i>
+                        <span>Nuevo Reporte</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Cards - Responsivas -->
+            <div class="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
+                <!-- Tarjeta 1 -->
+                <div class="bg-white rounded-lg shadow p-4 md:p-6 stats-card hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm mb-1">Total Usuarios</p>
+                            <p class="text-2xl md:text-3xl font-bold text-gray-800 text-responsive-lg">2,543</p>
+                            <p class="text-green-500 text-xs md:text-sm mt-1 flex items-center">
+                                <i class="fas fa-arrow-up mr-1 text-xs"></i> 12.5%
+                            </p>
+                        </div>
+                        <div class="bg-blue-100 p-2 md:p-3 rounded-full">
+                            <i class="fas fa-users text-blue-600 text-lg md:text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 2 -->
+                <div class="bg-white rounded-lg shadow p-4 md:p-6 stats-card hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm mb-1">Ingresos</p>
+                            <p class="text-2xl md:text-3xl font-bold text-gray-800 text-responsive-lg">$45,678</p>
+                            <p class="text-green-500 text-xs md:text-sm mt-1 flex items-center">
+                                <i class="fas fa-arrow-up mr-1 text-xs"></i> 8.2%
+                            </p>
+                        </div>
+                        <div class="bg-green-100 p-2 md:p-3 rounded-full">
+                            <i class="fas fa-dollar-sign text-green-600 text-lg md:text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 3 -->
+                <div class="bg-white rounded-lg shadow p-4 md:p-6 stats-card hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm mb-1">Pedidos</p>
+                            <p class="text-2xl md:text-3xl font-bold text-gray-800 text-responsive-lg">1,234</p>
+                            <p class="text-red-500 text-xs md:text-sm mt-1 flex items-center">
+                                <i class="fas fa-arrow-down mr-1 text-xs"></i> 3.1%
+                            </p>
+                        </div>
+                        <div class="bg-orange-100 p-2 md:p-3 rounded-full">
+                            <i class="fas fa-shopping-cart text-orange-600 text-lg md:text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 4 -->
+                <div class="bg-white rounded-lg shadow p-4 md:p-6 stats-card hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm mb-1">Satisfacción</p>
+                            <p class="text-2xl md:text-3xl font-bold text-gray-800 text-responsive-lg">4.8</p>
+                            <p class="text-green-500 text-xs md:text-sm mt-1 flex items-center">
+                                <i class="fas fa-arrow-up mr-1 text-xs"></i> 0.3
+                            </p>
+                        </div>
+                        <div class="bg-purple-100 p-2 md:p-3 rounded-full">
+                            <i class="fas fa-star text-purple-600 text-lg md:text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección de gráficos y actividad -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 md:mb-8">
+                <!-- Gráfico de ventas -->
+                <div class="lg:col-span-2 bg-white rounded-lg shadow p-4 md:p-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6">
+                        <h2 class="text-lg md:text-xl font-semibold text-gray-800 mb-2 sm:mb-0">Ventas Mensuales</h2>
+                        <select class="text-sm border border-gray-300 rounded-lg px-3 py-2 w-full sm:w-auto">
+                            <option>Últimos 7 días</option>
+                            <option>Último mes</option>
+                            <option>Último trimestre</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Gráfico simulado responsivo -->
+                    <div class="h-48 sm:h-56 md:h-64 flex items-end justify-between pt-4 px-2">
+                        <div class="flex flex-col items-center flex-1">
+                            <div class="w-8 md:w-10 lg:w-12 bg-indigo-500 rounded-t-lg" style="height: 80%;"></div>
+                            <span class="text-xs mt-2">Ene</span>
+                        </div>
+                        <div class="flex flex-col items-center flex-1">
+                            <div class="w-8 md:w-10 lg:w-12 bg-indigo-500 rounded-t-lg" style="height: 90%;"></div>
+                            <span class="text-xs mt-2">Feb</span>
+                        </div>
+                        <div class="flex flex-col items-center flex-1">
+                            <div class="w-8 md:w-10 lg:w-12 bg-indigo-500 rounded-t-lg" style="height: 60%;"></div>
+                            <span class="text-xs mt-2">Mar</span>
+                        </div>
+                        <div class="flex flex-col items-center flex-1">
+                            <div class="w-8 md:w-10 lg:w-12 bg-indigo-500 rounded-t-lg" style="height: 70%;"></div>
+                            <span class="text-xs mt-2">Abr</span>
+                        </div>
+                        <div class="flex flex-col items-center flex-1">
+                            <div class="w-8 md:w-10 lg:w-12 bg-indigo-500 rounded-t-lg" style="height: 85%;"></div>
+                            <span class="text-xs mt-2">May</span>
+                        </div>
+                        <div class="flex flex-col items-center flex-1">
+                            <div class="w-8 md:w-10 lg:w-12 bg-indigo-600 rounded-t-lg" style="height: 95%;"></div>
+                            <span class="text-xs mt-2">Jun</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actividad Reciente -->
+                <div class="bg-white rounded-lg shadow p-4 md:p-6">
+                    <h2 class="text-lg md:text-xl font-semibold text-gray-800 mb-6">Actividad Reciente</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <div class="bg-green-100 p-2 rounded-full mr-3 flex-shrink-0">
+                                <i class="fas fa-user-plus text-green-600"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="font-medium text-sm md:text-base truncate">Nuevo usuario registrado</p>
+                                <p class="text-xs md:text-sm text-gray-500">Hace 10 minutos</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="bg-blue-100 p-2 rounded-full mr-3 flex-shrink-0">
+                                <i class="fas fa-shopping-cart text-blue-600"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="font-medium text-sm md:text-base truncate">Pedido #1245 completado</p>
+                                <p class="text-xs md:text-sm text-gray-500">Hace 45 minutos</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="bg-purple-100 p-2 rounded-full mr-3 flex-shrink-0">
+                                <i class="fas fa-chart-line text-purple-600"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="font-medium text-sm md:text-base truncate">Reporte mensual generado</p>
+                                <p class="text-xs md:text-sm text-gray-500">Hace 2 horas</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="bg-orange-100 p-2 rounded-full mr-3 flex-shrink-0">
+                                <i class="fas fa-exclamation-triangle text-orange-600"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="font-medium text-sm md:text-base truncate">Producto agotado</p>
+                                <p class="text-xs md:text-sm text-gray-500">Hace 5 horas</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de Pedidos Recientes -->
+            <div class="bg-white rounded-lg shadow overflow-hidden mb-6 md:mb-8">
+                <div class="px-4 md:px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between">
+                    <h2 class="text-lg md:text-xl font-semibold text-gray-800 mb-2 sm:mb-0">Pedidos Recientes</h2>
+                    <button class="text-sm text-indigo-600 hover:text-indigo-800 font-medium flex items-center">
+                        <i class="fas fa-download mr-2"></i>
+                        <span class="hidden xs:inline">Exportar</span>
+                    </button>
+                </div>
+                
+                <!-- Tabla responsiva -->
+                <div class="responsive-table-container">
+                    <table class="w-full min-w-max">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">ID</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Cliente</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap hidden md:table-cell">Producto</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Fecha</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap hidden sm:table-cell">Monto</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap table-cell">#1234</td>
+                                <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap table-cell">Juan Pérez</td>
+                                <td class="px-4 py-3 text-sm text-gray-900 hidden md:table-cell">Laptop Pro</td>
+                                <td class="px-4 py-3 text-sm text-gray-500 whitespace-nowrap table-cell">15/01/24</td>
+                                <td class="px-4 py-3 text-sm text-gray-900 hidden sm:table-cell">$1,299</td>
+                                <td class="px-4 py-3 table-cell">
+                                    <span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full whitespace-nowrap">Completado</span>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap table-cell">#1235</td>
+                                <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap table-cell">María García</td>
+                                <td class="px-4 py-3 text-sm text-gray-900 hidden md:table-cell">Mouse Wireless</td>
+                                <td class="px-4 py-3 text-sm text-gray-500 whitespace-nowrap table-cell">15/01/24</td>
+                                <td class="px-4 py-3 text-sm text-gray-900 hidden sm:table-cell">$49</td>
+                                <td class="px-4 py-3 table-cell">
+                                    <span class="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full whitespace-nowrap">Pendiente</span>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap table-cell">#1236</td>
+                                <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap table-cell">Carlos López</td>
+                                <td class="px-4 py-3 text-sm text-gray-900 hidden md:table-cell">Teclado Mecánico</td>
+                                <td class="px-4 py-3 text-sm text-gray-500 whitespace-nowrap table-cell">14/01/24</td>
+                                <td class="px-4 py-3 text-sm text-gray-900 hidden sm:table-cell">$129</td>
+                                <td class="px-4 py-3 table-cell">
+                                    <span class="px-2 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full whitespace-nowrap">Procesando</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Paginación -->
+                <div class="px-4 md:px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between">
+                    <p class="text-sm text-gray-700 mb-3 sm:mb-0">
+                        Mostrando <span class="font-medium">1-3</span> de <span class="font-medium">24</span>
+                    </p>
+                    <div class="flex space-x-2">
+                        <button class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">←</button>
+                        <button class="px-3 py-1 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700">1</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">2</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">→</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="text-center text-gray-500 text-sm py-4 border-t border-gray-200">
+                <p>© 2024 DashPro. Todos los derechos reservados.</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Funcionalidad para menú móvil
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.getElementById('mobileMenuButton');
+            const closeMobileMenu = document.getElementById('closeMobileMenu');
+            const mobileSidebar = document.getElementById('mobileSidebar');
+            const menuOverlay = document.getElementById('menuOverlay');
+            const toggleSidebar = document.getElementById('toggleSidebar');
+            const sidebar = document.getElementById('sidebar');
+            
+            // Abrir menú móvil
+            mobileMenuButton.addEventListener('click', () => {
+                mobileSidebar.classList.add('active');
+                menuOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+            
+            // Cerrar menú móvil
+            closeMobileMenu.addEventListener('click', () => {
+                mobileSidebar.classList.remove('active');
+                menuOverlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+            
+            // Cerrar menú al hacer clic en overlay
+            menuOverlay.addEventListener('click', () => {
+                mobileSidebar.classList.remove('active');
+                menuOverlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+            
+            // Cerrar menú al redimensionar a pantalla grande
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 1024) {
+                    mobileSidebar.classList.remove('active');
+                    menuOverlay.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+            
+            // Toggle sidebar en desktop
+            let sidebarCollapsed = false;
+            if (toggleSidebar) {
+                toggleSidebar.addEventListener('click', () => {
+                    sidebarCollapsed = !sidebarCollapsed;
+                    
+                    if (sidebarCollapsed) {
+                        sidebar.classList.add('hidden');
+                        toggleSidebar.innerHTML = '<i class="fas fa-chevron-right"></i>';
+                    } else {
+                        sidebar.classList.remove('hidden');
+                        toggleSidebar.innerHTML = '<i class="fas fa-chevron-left"></i>';
+                    }
+                });
+            }
+            
+            // Activar enlaces del menú móvil
+            const mobileMenuLinks = document.querySelectorAll('#mobileSidebar a');
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileSidebar.classList.remove('active');
+                    menuOverlay.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                });
+            });
+            
+            // Activar enlaces del menú desktop
+            const desktopMenuLinks = document.querySelectorAll('#sidebar a');
+            desktopMenuLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    if (link.getAttribute('href') === '#') {
+                        e.preventDefault();
+                    }
+                    
+                    // Remover clase activa de todos los enlaces
+                    desktopMenuLinks.forEach(item => {
+                        item.classList.remove('bg-indigo-50', 'border-indigo-600');
+                        item.classList.add('text-gray-600', 'hover:bg-gray-100');
+                    });
+                    
+                    // Agregar clase activa al enlace clicado
+                    link.classList.add('bg-indigo-50', 'border-indigo-600');
+                    link.classList.remove('text-gray-600', 'hover:bg-gray-100');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
